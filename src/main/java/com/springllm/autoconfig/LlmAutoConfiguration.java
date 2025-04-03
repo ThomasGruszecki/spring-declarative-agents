@@ -6,6 +6,7 @@ import static java.util.Objects.requireNonNull;
 
 import com.springllm.annotations.LargeLanguageModelProxy;
 import com.springllm.annotations.Prompt;
+import com.springllm.config.DefaultConfig;
 import com.springllm.config.LlmProperties;
 import com.springllm.proxy.LlmFactoryBean;
 import java.util.Objects;
@@ -27,6 +28,7 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
@@ -37,6 +39,7 @@ import org.springframework.util.StringUtils;
  */
 @AutoConfiguration
 @ConditionalOnClass({LlmProperties.class, LlmFactoryBean.class})
+@Import(DefaultConfig.class)
 @Slf4j
 public class LlmAutoConfiguration implements BeanDefinitionRegistryPostProcessor, ApplicationContextAware {
 
@@ -130,7 +133,7 @@ public class LlmAutoConfiguration implements BeanDefinitionRegistryPostProcessor
    * @return Array of base packages to scan.
    */
   private String[] determineBasePackages() {
-    String[] basePackages = Optional.ofNullable(
+    final String[] basePackages = Optional.ofNullable(
             applicationContext.getEnvironment().getProperty("spring.llm.scan-packages", String[].class)
         )
         .filter(ArrayUtils::isNotEmpty)
@@ -162,6 +165,7 @@ public class LlmAutoConfiguration implements BeanDefinitionRegistryPostProcessor
         });
 
     log.info("Using these base packages for scanning: {}", (Object) basePackages); // Cast to Object for varargs log
+
     return basePackages;
   }
 
