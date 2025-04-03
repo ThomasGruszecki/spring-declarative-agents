@@ -247,7 +247,7 @@ class SpringLlmStarterIntegrationTests {
     assertThatThrownBy(() -> testLlmClient.acknowledge(message))
         .isInstanceOf(UnsupportedOperationException.class);
 
-    log.info("Verified void method acknowledge() made the correct API call.");
+    log.info("Verified void method acknowledge() throws exception.");
   }
 
   @Test
