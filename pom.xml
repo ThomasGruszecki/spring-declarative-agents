@@ -11,6 +11,25 @@
 
   <repositories>
     <repository>
+      <id>spring-snapshots</id>
+      <name>Spring Snapshots</name>
+      <url>https://repo.spring.io/snapshot</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+    </repository>
+    <repository>
+      <name>Central Portal Snapshots</name>
+      <id>central-portal-snapshots</id>
+      <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+    <repository>
       <id>projectlombok.org</id>
       <url>https://projectlombok.org/edge-releases</url>
     </repository>
@@ -22,7 +41,7 @@
     <maven.compiler.source>24</maven.compiler.source>
     <maven.compiler.target>24</maven.compiler.target>
     <spring-boot.version>3.4.4</spring-boot.version>
-    <spring-ai.version>1.0.0-M1</spring-ai.version>
+    <spring-ai.version>1.0.0-SNAPSHOT</spring-ai.version>
     <jackson.version>2.18.3</jackson.version>
     <mockwebserver.version>4.12.0</mockwebserver.version>
   </properties>
@@ -48,6 +67,11 @@
   </dependencyManagement>
 
   <dependencies>
+
+    <dependency>
+      <groupId>org.springframework.ai</groupId>
+      <artifactId>spring-ai-core</artifactId>
+    </dependency>
 
     <dependency>
       <groupId>jakarta.websocket</groupId>
