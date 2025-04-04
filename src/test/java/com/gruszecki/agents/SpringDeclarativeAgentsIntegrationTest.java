@@ -1,4 +1,4 @@
-package com.springllm;
+package com.gruszecki.agents;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.springllm.config.LlmProperties;
+import com.gruszecki.agents.config.LlmProperties;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Map;
@@ -32,7 +32,7 @@ import org.springframework.test.util.TestSocketUtils;
 // Load test application context
 @ActiveProfiles("test") // Activate application-test.yml
 @Slf4j
-class SpringLlmStarterIntegrationTests {
+class SpringDeclarativeAgentsIntegrationTest {
 
   // --- Mock Web Server Setup ---
   static final String mockBackEndHost = "localhost";
@@ -49,7 +49,7 @@ class SpringLlmStarterIntegrationTests {
     String mockApiUrl = String.format("http://%s:%s", mockBackEndHost, mockBackEndPort);
     registry.add("llm.providers.TestLM.api-url", () -> mockApiUrl);
     // You could override other properties dynamically here too
-    // registry.add("logging.level.com.example.springllm", () -> "TRACE");
+    // registry.add("logging.level.com.gruszecki.agents", () -> "TRACE");
   }
 
   @BeforeEach
@@ -226,12 +226,9 @@ class SpringLlmStarterIntegrationTests {
   void invokeMethodWithoutPromptAnnotation() {
     // Arrange & Act
     // Attempt to call the method not annotated with @Prompt
-    // The LlmFactoryBean's invoke method should handle this (e.g., return null or throw)
-    String result = testLlmClient.methodWithoutPrompt();
+    assertThatThrownBy(() -> testLlmClient.methodWithoutPrompt())
+        .isInstanceOf(UnsupportedOperationException.class);
 
-    // Assert
-    // Based on the current LlmFactoryBean implementation, it returns null for non-void, non-primitive types
-    assertThat(result).isNull();
     // Ensure no request was sent to the mock server
     assertThat(mockWebServer.getRequestCount()).isZero();
     log.info("Verified that methodWithoutPrompt returned null and made no API call.");
@@ -246,6 +243,9 @@ class SpringLlmStarterIntegrationTests {
     // Call the void method. Expect an exception.
     assertThatThrownBy(() -> testLlmClient.acknowledge(message))
         .isInstanceOf(UnsupportedOperationException.class);
+
+    // Ensure no request was sent to the mock server
+    assertThat(mockWebServer.getRequestCount()).isZero();
 
     log.info("Verified void method acknowledge() throws exception.");
   }
@@ -281,12 +281,6 @@ class SpringLlmStarterIntegrationTests {
         );
 
     return objectMapper.writeValueAsString(responseMap);
-
-    // --- Alternative simpler structure (if LlmFactoryBean expects this) ---
-         /*
-         Map<String, Object> responseMap = Map.of("completion", content);
-         return objectMapper.writeValueAsString(responseMap);
-         */
   }
 }
 

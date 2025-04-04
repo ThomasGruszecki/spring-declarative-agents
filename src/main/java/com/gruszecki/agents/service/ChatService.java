@@ -1,7 +1,7 @@
-package com.springllm.service;
+package com.gruszecki.agents.service;
 
-import com.springllm.annotations.LargeLanguageModelProxy;
-import com.springllm.annotations.Prompt;
+import com.gruszecki.agents.annotations.LargeLanguageModelProxy;
+import com.gruszecki.agents.annotations.Prompt;
 import java.lang.reflect.Method;
 
 public interface ChatService {
@@ -11,4 +11,6 @@ public interface ChatService {
       Prompt promptAnnotation,
       Method method,
       Object[] args);
+
+  String getSupportedApi();
 }

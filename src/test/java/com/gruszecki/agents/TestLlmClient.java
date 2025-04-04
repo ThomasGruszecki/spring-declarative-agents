@@ -1,7 +1,7 @@
-package com.springllm;
+package com.gruszecki.agents;
 
-import com.springllm.annotations.LargeLanguageModelProxy;
-import com.springllm.annotations.Prompt;
+import com.gruszecki.agents.annotations.LargeLanguageModelProxy;
+import com.gruszecki.agents.annotations.Prompt;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.Map;

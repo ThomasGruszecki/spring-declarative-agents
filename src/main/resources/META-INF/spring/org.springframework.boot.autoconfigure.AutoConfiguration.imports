@@ -1,2 +1,2 @@
-com.springllm.autoconfig.LlmAutoConfiguration
+com.gruszecki.agents.autoconfig.SpringDeclarativeAgentsAutoConfig
 

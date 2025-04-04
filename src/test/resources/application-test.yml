@@ -1,4 +1,4 @@
-# Test properties used by SpringLlmStarterIntegrationTests
+# Test properties used by SpringDeclarativeAgentsIntegrationTests
 # These will override any properties in application.yml during tests
 llm:
   providers:
@@ -17,12 +17,12 @@ llm:
 # Optional: Define the base package for scanning if not relying on default/auto-detection
 # spring:
 #   llm:
-#     scan-packages: com.example.springllm.testclients
+#     scan-packages: com.gruszecki.agents.testclients
 
 # Logging level for tests (optional)
 logging:
   level:
-    com.example.springllm: DEBUG # Set to DEBUG to see detailed logs from the starter
+    com.gruszecki.agents: DEBUG # Set to DEBUG to see detailed logs from the starter
     # org.springframework.web: DEBUG # Uncomment for Spring WebClient logging
     # okhttp3.mockwebserver.MockWebServer: DEBUG # Uncomment for MockWebServer logging
 

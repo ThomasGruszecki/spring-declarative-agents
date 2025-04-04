@@ -1,14 +1,14 @@
-package com.springllm.autoconfig;
+package com.gruszecki.agents.autoconfig;
 
 
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
-import com.springllm.annotations.LargeLanguageModelProxy;
-import com.springllm.annotations.Prompt;
-import com.springllm.config.DefaultConfig;
-import com.springllm.config.LlmProperties;
-import com.springllm.proxy.LlmFactoryBean;
+import com.gruszecki.agents.annotations.LargeLanguageModelProxy;
+import com.gruszecki.agents.annotations.Prompt;
+import com.gruszecki.agents.config.DefaultConfig;
+import com.gruszecki.agents.config.LlmProperties;
+import com.gruszecki.agents.proxy.LlmFactoryBean;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -41,7 +41,7 @@ import org.springframework.util.StringUtils;
 @ConditionalOnClass({LlmProperties.class, LlmFactoryBean.class})
 @Import(DefaultConfig.class)
 @Slf4j
-public class LlmAutoConfiguration implements BeanDefinitionRegistryPostProcessor, ApplicationContextAware {
+public class SpringDeclarativeAgentsAutoConfig implements BeanDefinitionRegistryPostProcessor, ApplicationContextAware {
 
   private ApplicationContext applicationContext;
 

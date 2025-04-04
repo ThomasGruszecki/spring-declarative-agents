@@ -1,17 +1,16 @@
-package com.springllm.proxy;
+package com.gruszecki.agents.proxy;
 
 import static java.util.Objects.isNull;
 
-import com.springllm.annotations.LargeLanguageModelProxy;
-import com.springllm.annotations.Prompt;
-import com.springllm.config.LlmProperties;
-import com.springllm.service.ChatService;
-import com.springllm.service.ChatServiceLookup;
+import com.gruszecki.agents.annotations.LargeLanguageModelProxy;
+import com.gruszecki.agents.annotations.Prompt;
+import com.gruszecki.agents.config.LlmProperties;
+import com.gruszecki.agents.service.ChatService;
+import com.gruszecki.agents.service.ChatServiceLookup;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Arrays;
-import java.util.Map;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.Setter;
@@ -20,7 +19,6 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.util.Assert;
@@ -39,6 +37,8 @@ public class LlmFactoryBean<T> implements FactoryBean<T>,
     InitializingBean,
     BeanFactoryAware { // Implement InitializingBean and BeanFactoryAware
 
+  /* --- Constructor Relevant Fields --- */
+
   @NonNull
   private final Class<T> interfaceClass;
 
@@ -47,7 +47,11 @@ public class LlmFactoryBean<T> implements FactoryBean<T>,
 
   @Setter // Overrides from BeanFactoryAware
   private BeanFactory beanFactory;
+
+  /* --- Post Constructor Fields --- */
+
   private LargeLanguageModelProxy llmBeanAnnotation;
+
   private ChatService chatService;
 
   /**
@@ -68,8 +72,7 @@ public class LlmFactoryBean<T> implements FactoryBean<T>,
     } catch (IllegalArgumentException e) {
       // Provide more context in the error message
       throw new IllegalArgumentException(
-          String.format("Configuration error for LLM bean '%s' (%s): %s",
-              getBeanName(), // Get the bean name for better context
+          String.format("Configuration error for LLM bean %s: %s",
               interfaceClass.getName(),
               e.getMessage()), e);
     }
@@ -107,17 +110,7 @@ public class LlmFactoryBean<T> implements FactoryBean<T>,
 
   @Override
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-    // Ensure initialization before invocation (defensive check)
     log.info("Proxy invoked for method {} with args {}", method.getName(), Arrays.toString(args));
-    if (isNull(this.chatService)) {
-      throw new IllegalStateException("LlmFactoryBean for " + interfaceClass.getName()
-          + " was not properly initialized.");
-    }
-
-    if (method.getReturnType().isPrimitive()) {
-      log.error("Primitive return type detected! Failing");
-      throw new UnsupportedOperationException("Primitive types not supported by @LargeLanguageModelProxy");
-    }
 
     // Pass standard methods like toString/hashCode to the Object class
     if (method.getDeclaringClass() == Object.class) {
@@ -125,20 +118,27 @@ public class LlmFactoryBean<T> implements FactoryBean<T>,
     }
 
     Prompt promptAnnotation = AnnotationUtils.findAnnotation(method, Prompt.class);
-    if (promptAnnotation == null) {
-      log.warn("Method {} in LLM bean {} is not annotated with @Prompt. Cannot invoke LLM.",
+
+    // Ensure initialization before invocation (defensive check)
+    if (isNull(this.chatService)) {
+      throw new IllegalStateException("LlmFactoryBean for " + interfaceClass.getName()
+          + " was not properly initialized.");
+    }
+
+    if (method.getReturnType().isPrimitive()) {
+      log.error("Primitive return types not supported by @LargeLanguageModelProxy");
+      throw new UnsupportedOperationException("Primitive return types not supported by @LargeLanguageModelProxy");
+    }
+
+    if (isNull(promptAnnotation)) {
+      log.error("Method {} in LLM bean {} is not annotated with @Prompt. Cannot invoke LLM.",
           method.getName(), interfaceClass.getSimpleName());
-      Map<Class<?>, Object> returnType = Map.of(
-          byte.class, 0,
-          short.class, 0,
-          int.class, 0,
-          long.class, 0L,
-          float.class, 0.0f,
-          double.class, 0.0,
-          char.class, '0',
-          boolean.class, false
+      throw new UnsupportedOperationException(
+          String.format("Method %s in LLM bean %s must have @Prompt annotation!",
+              method.getName(),
+              interfaceClass.getSimpleName()
+          )
       );
-      return returnType.getOrDefault(method.getReturnType(), null);
     }
 
     return chatService.handlePrompt(llmBeanAnnotation, promptAnnotation, method, args);
@@ -154,19 +154,5 @@ public class LlmFactoryBean<T> implements FactoryBean<T>,
   @Override
   public boolean isSingleton() {
     return true;
-  }
-
-  // Helper to get bean name for logging/error messages
-  private String getBeanName() {
-    // Try to determine the bean name Spring assigned to this FactoryBean
-    // This requires BeanFactoryAware to be implemented and beanFactory set.
-    if (beanFactory != null && beanFactory instanceof ConfigurableListableBeanFactory) {
-      ConfigurableListableBeanFactory clbf = (ConfigurableListableBeanFactory) beanFactory;
-      // Find the bean definition associated with this FactoryBean instance (can be complex)
-      // A simpler approach is to rely on the name generated in AutoConfiguration
-      // or potentially pass it during construction if needed for errors.
-    }
-    // Fallback name
-    return interfaceClass.getSimpleName() + "FactoryBean";
   }
 }
