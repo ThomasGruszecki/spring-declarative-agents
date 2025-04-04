@@ -3,32 +3,13 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>com.springllm</groupId>
-  <artifactId>spring-llm-starter</artifactId>
+  <groupId>com.gruszecki.agents</groupId>
+  <artifactId>spring-declarative-agents</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <name>spring-llm-starter</name>
-  <description>Spring Boot Starter for Large Language Model API Usage</description>
+  <name>spring-declarative-agents</name>
+  <description>A Spring Boot starter that allows you to create declarative Large Language Model (LLM) clients using simple Java interfaces and annotations.</description>
 
   <repositories>
-    <repository>
-      <id>spring-snapshots</id>
-      <name>Spring Snapshots</name>
-      <url>https://repo.spring.io/snapshot</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-    </repository>
-    <repository>
-      <name>Central Portal Snapshots</name>
-      <id>central-portal-snapshots</id>
-      <url>https://central.sonatype.com/repository/maven-snapshots/</url>
-      <releases>
-        <enabled>false</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
     <repository>
       <id>projectlombok.org</id>
       <url>https://projectlombok.org/edge-releases</url>
@@ -67,11 +48,6 @@
   </dependencyManagement>
 
   <dependencies>
-
-    <dependency>
-      <groupId>org.springframework.ai</groupId>
-      <artifactId>spring-ai-core</artifactId>
-    </dependency>
 
     <dependency>
       <groupId>jakarta.websocket</groupId>
