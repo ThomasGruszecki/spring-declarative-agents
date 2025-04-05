@@ -2,7 +2,7 @@ package com.gruszecki.agents.service;
 
 import static lombok.AccessLevel.PRIVATE;
 
-import com.gruszecki.agents.config.AgentProxyConfig;
+import com.gruszecki.agents.config.ChatServiceConfig;
 import java.util.NoSuchElementException;
 import lombok.Builder;
 import lombok.NonNull;
@@ -16,7 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 public class ChatServiceLookup {
 
   @NonNull
-  AgentProxyConfig proxyConfig;
+  ChatServiceConfig proxyConfig;
 
   public ChatService getChatService(@NonNull final String api) {
     return proxyConfig.getChatServices().stream()
