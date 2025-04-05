@@ -6,7 +6,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gruszecki.agents.config.LlmProperties;
+import com.gruszecki.agents.config.AgentProxyProperties;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.Map;
@@ -26,11 +26,11 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.util.TestSocketUtils;
 
 /**
- * Integration tests for the Spring LLM Starter. Uses MockWebServer to simulate LLM API responses.
+ * Integration tests for the Spring LLM Starter.
+ * Uses MockWebServer to simulate LLM API responses.
  */
 @SpringBootTest(classes = TestApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-// Load test application context
-@ActiveProfiles("test") // Activate application-test.yml
+@ActiveProfiles("test")
 @Slf4j
 class SpringDeclarativeAgentsIntegrationTest {
 
@@ -48,7 +48,7 @@ class SpringDeclarativeAgentsIntegrationTest {
   static void setDynamicProperties(DynamicPropertyRegistry registry) {
     String mockApiUrl = String.format("http://%s:%s", mockBackEndHost, mockBackEndPort);
     registry.add("llm.providers.TestLM.api-url", () -> mockApiUrl);
-    // You could override other properties dynamically here too
+    // override other properties dynamically here too
     // registry.add("logging.level.com.gruszecki.agents", () -> "TRACE");
   }
 
@@ -68,7 +68,7 @@ class SpringDeclarativeAgentsIntegrationTest {
   private ApplicationContext context;
 
   @Autowired
-  private LlmProperties llmProperties; // Autowire properties to verify loading
+  private AgentProxyProperties agentProxyProperties; // Autowire properties to verify loading
 
   @Autowired
   private TestLlmClient testLlmClient; // Autowire the dynamically created bean
@@ -80,7 +80,6 @@ class SpringDeclarativeAgentsIntegrationTest {
   void contextLoads() {
     // Basic test to ensure the application context loads successfully
     // with the starter's auto-configuration included.
-
     assertThat(context).isNotNull();
     log.info("ApplicationContext loaded successfully.");
   }
@@ -88,11 +87,11 @@ class SpringDeclarativeAgentsIntegrationTest {
   @Test
   void propertiesLoad() {
     // Verify that properties from application-test.yml are loaded correctly.
-    assertThat(llmProperties).isNotNull();
-    assertThat(llmProperties.getProviders()).containsKey("TestLM");
-    assertThat(llmProperties.getProviders()).containsKey("AnotherLM");
+    assertThat(agentProxyProperties).isNotNull();
+    assertThat(agentProxyProperties.getProviders()).containsKey("TestLM");
+    assertThat(agentProxyProperties.getProviders()).containsKey("AnotherLM");
 
-    LlmProperties.ProviderConfig testLmConfig = llmProperties.getProvider("TestLM");
+    AgentProxyProperties.ProviderConfig testLmConfig = agentProxyProperties.getProvider("TestLM");
     assertThat(testLmConfig.getApiKey()).isEqualTo("test-key-12345");
 
     // Check the dynamically set URL
@@ -100,13 +99,13 @@ class SpringDeclarativeAgentsIntegrationTest {
     assertThat(testLmConfig.getApiUrl()).isEqualTo(String.format("http://%s:%s", mockBackEndHost, mockBackEndPort));
 
     //Check the default url
-    LlmProperties.ProviderConfig anotherLmConfig = llmProperties.getProvider("AnotherLM");
+    AgentProxyProperties.ProviderConfig anotherLmConfig = agentProxyProperties.getProvider("AnotherLM");
     assertThat(anotherLmConfig.getApiKey()).isEqualTo("another-key-67890");
 
     // Ensure the placeholder wasn't overridden if not specified dynamically
     assertThat(anotherLmConfig.getApiUrl()).isEqualTo("http://localhost:8081");
 
-    log.info("LlmProperties loaded and verified: {}", llmProperties);
+    log.info("AgentProxyProperties loaded and verified: {}", agentProxyProperties);
   }
 
   @Test
@@ -118,7 +117,7 @@ class SpringDeclarativeAgentsIntegrationTest {
     String[] beanNames = context.getBeanNamesForType(TestLlmClient.class);
     assertThat(beanNames).contains("testLlmClientLlmProxyBean"); // Default name convention
 
-    // If you set a custom beanName = "myCustomTestClient" in @LargeLanguageModelProxy:
+    // If you set a custom beanName = "myCustomTestClient" in @AgentProxy:
     // assertThat(beanNames).contains("myCustomTestClient");
     log.info("TestLlmClient bean found: {}", testLlmClient.getClass().getName());
   }
@@ -139,7 +138,7 @@ class SpringDeclarativeAgentsIntegrationTest {
     RecordedRequest recordedRequest = mockWebServer.takeRequest(); // Get the request sent
     assertThat(recordedRequest.getMethod()).isEqualTo("POST");
 
-    // Path depends on your LlmFactoryBean implementation (e.g., "/completions")
+    // Path depends on your AgentProxyFactoryBean implementation (e.g., "/completions")
     assertThat(recordedRequest.getPath()).endsWith("/completions");
     assertThat(recordedRequest.getHeader("Authorization")).isEqualTo("Bearer test-key-12345");
     assertThat(recordedRequest.getHeader("Content-Type")).isEqualTo("application/json");
@@ -252,10 +251,10 @@ class SpringDeclarativeAgentsIntegrationTest {
 
   @Test
   void testInvalidProviderConfiguration() {
-    // Test what happens if @LargeLanguageModelProxy references a provider not in properties
+    // Test what happens if @AgentProxy references a provider not in properties
     // This requires a separate test context setup or manipulating properties,
-    // which is more advanced. For now, we know LlmFactoryBean constructor throws.
-    // A simpler check is that LlmProperties validation works.
+    // which is more advanced. For now, we know AgentProxyFactoryBean constructor throws.
+    // A simpler check is that AgentProxyProperties validation works.
     // (Validation is implicitly tested by context loading with @Validated)
     log.info("Implicitly tested configuration validation during context load.");
   }
@@ -264,13 +263,13 @@ class SpringDeclarativeAgentsIntegrationTest {
 
   /**
    * Creates a mock JSON response string mimicking a typical LLM API structure. Adapts this structure based on how your
-   * LlmFactoryBean::processLlmResponse expects to parse the response.
+   * AgentProxyFactoryBean::processLlmResponse expects to parse the response.
    *
    * @param content The desired text content for the LLM response.
    * @return A JSON string representing the mock API response.
    */
   private String createMockApiResponse(String content) throws JsonProcessingException {
-    // Example structure matching OpenAI chat completion format used in LlmFactoryBean example
+    // Example structure matching OpenAI chat completion format used in AgentProxyFactoryBean example
     Map<String, Object> messageMap = Map.of("role", "assistant", "content", content);
     Map<String, Object> choiceMap = Map.of("index", 0, "message", messageMap, "finish_reason", "stop");
     Map<String, Object> responseMap =

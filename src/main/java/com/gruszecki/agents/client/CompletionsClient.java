@@ -2,9 +2,9 @@ package com.gruszecki.agents.client;
 
 import static lombok.AccessLevel.PRIVATE;
 
-import com.gruszecki.agents.completions.ChatCompletionChunk;
-import com.gruszecki.agents.completions.ChatCompletionRequest;
-import com.gruszecki.agents.completions.ChatCompletionResponse;
+import com.gruszecki.agents.domain.api.completions.ChatCompletionChunk;
+import com.gruszecki.agents.domain.api.completions.ChatCompletionRequest;
+import com.gruszecki.agents.domain.api.completions.ChatCompletionResponse;
 import lombok.Builder;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,7 @@ import reactor.core.publisher.Mono;
 @Slf4j
 @FieldDefaults(makeFinal = true, level = PRIVATE)
 @Builder
-public class CompletionsClient implements LlmApiClient {
+public class CompletionsClient implements AgentProxyApiClient {
 
   WebClient.Builder webClientBuilder;
 

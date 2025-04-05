@@ -6,14 +6,19 @@ import com.gruszecki.agents.service.PromptResolverService;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.ExchangeStrategies;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Slf4j
-@Configuration
-public class DefaultConfig {
+public class AgentProxyBeansConfig {
+
+  @Bean
+  @ConfigurationProperties(prefix = "llm")
+  AgentProxyProperties properties() {
+    return new AgentProxyProperties();
+  }
 
   @ConditionalOnMissingBean()
   @Bean
@@ -42,19 +47,19 @@ public class DefaultConfig {
 
   @ConditionalOnMissingBean
   @Bean
-  public AgentProxyConfig simpleAgentProxyConfig(
+  public ChatServiceConfig simpleAgentProxyConfig(
       @NonNull WebClient.Builder webClientBuilder,
       @NonNull ObjectMapper objectMapper,
-      @NonNull LlmProperties llmProperties,
+      @NonNull AgentProxyProperties agentProxyProperties,
       @NonNull PromptResolverService promptResolverService) {
-    return new SimpleAgentProxyConfig(webClientBuilder, objectMapper, llmProperties, promptResolverService);
+    return new SimpleChatServiceConfig(webClientBuilder, objectMapper, agentProxyProperties, promptResolverService);
   }
 
   @ConditionalOnMissingBean
   @Bean
-  public ChatServiceLookup chatServiceLookup(AgentProxyConfig agentProxyConfig) {
+  public ChatServiceLookup chatServiceLookup(ChatServiceConfig chatServiceConfig) {
     return ChatServiceLookup.builder()
-        .proxyConfig(agentProxyConfig)
+        .proxyConfig(chatServiceConfig)
         .build();
   }
 

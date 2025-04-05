@@ -1,4 +1,4 @@
-package com.gruszecki.agents.completions;
+package com.gruszecki.agents.domain.api.completions;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -10,14 +10,11 @@ import lombok.extern.jackson.Jacksonized;
 @Builder
 @Jacksonized
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Usage {
+public class Tool {
 
-  @JsonProperty("prompt_tokens")
-  Integer promptTokens;
+  @JsonProperty("type")
+  String type;
 
-  @JsonProperty("completion_tokens")
-  Integer completionTokens;
-
-  @JsonProperty("total_tokens")
-  Integer totalTokens;
+  @JsonProperty("function")
+  FunctionDefinition function;
 }

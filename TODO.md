@@ -24,14 +24,14 @@ This list outlines planned features and improvements for the `spring-declarative
 
 * **Advanced `ChatOptions` Configuration:**
     * Allow `ChatOptions` (temperature, topP, maxTokens, stop sequences) to be configured via
-      `@LargeLanguageModelProxy` and/or `@Prompt` annotations.
-    * Define clear precedence rules (e.g., `@Prompt` overrides `@LargeLanguageModelProxy` overrides
+      `@AgentProxy` and/or `@Prompt` annotations.
+    * Define clear precedence rules (e.g., `@Prompt` overrides `@AgentProxy` overrides
       Spring AI defaults).
 
 * **Enhanced Provider/Client Selection:**
     * Improve support for selecting specific, *named* `ChatClient` beans (when multiple providers
       like OpenAI, Ollama, Anthropic are configured via Spring AI) using the `api` attribute in
-      `@LargeLanguageModelProxy`.
+      `@AgentProxy`.
     * Requires clear documentation on bean naming conventions for `ChatClient` beans.
 
 * **Improved Error Handling:**

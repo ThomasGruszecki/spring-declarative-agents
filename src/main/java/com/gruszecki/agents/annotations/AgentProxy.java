@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Component
-public @interface LargeLanguageModelProxy {
+public @interface AgentProxy {
 
   /**
    * The name of the LLM provider to use (e.g., "OpenAI", "Claude"). This must match a key under the 'llm.providers'

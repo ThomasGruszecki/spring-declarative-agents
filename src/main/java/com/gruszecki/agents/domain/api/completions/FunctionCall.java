@@ -1,4 +1,4 @@
-package com.gruszecki.agents.completions;
+package com.gruszecki.agents.domain.api.completions;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -10,14 +10,11 @@ import lombok.extern.jackson.Jacksonized;
 @Builder
 @Jacksonized
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ToolCall {
+public class FunctionCall {
 
-  @JsonProperty("id")
-  String id;
+  @JsonProperty("name")
+  String name;
 
-  @JsonProperty("type")
-  String type;
-
-  @JsonProperty("function")
-  FunctionCall function;
+  @JsonProperty("arguments")
+  String arguments;
 }

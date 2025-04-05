@@ -1,8 +1,7 @@
-package com.gruszecki.agents.completions;
+package com.gruszecki.agents.domain.api.completions;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.Map;
 import lombok.Builder;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
@@ -11,14 +10,14 @@ import lombok.extern.jackson.Jacksonized;
 @Builder
 @Jacksonized
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class FunctionDefinition {
+public class Usage {
 
-  @JsonProperty("name")
-  String name;
+  @JsonProperty("prompt_tokens")
+  Integer promptTokens;
 
-  @JsonProperty("description")
-  String description;
+  @JsonProperty("completion_tokens")
+  Integer completionTokens;
 
-  @JsonProperty("parameters")
-  Map<String, Object> parameters;
+  @JsonProperty("total_tokens")
+  Integer totalTokens;
 }

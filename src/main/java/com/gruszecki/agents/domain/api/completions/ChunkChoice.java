@@ -1,4 +1,4 @@
-package com.gruszecki.agents.completions;
+package com.gruszecki.agents.domain.api.completions;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -10,8 +10,14 @@ import lombok.extern.jackson.Jacksonized;
 @Builder
 @Jacksonized
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ErrorResponse {
+public class ChunkChoice {
 
-  @JsonProperty("error")
-  Error error;
+  @JsonProperty("index")
+  Integer index;
+
+  @JsonProperty("delta")
+  Delta delta;
+
+  @JsonProperty("finish_reason")
+  String finishReason;
 }

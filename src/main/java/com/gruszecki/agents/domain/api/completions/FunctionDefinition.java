@@ -1,8 +1,8 @@
-package com.gruszecki.agents.completions;
+package com.gruszecki.agents.domain.api.completions;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.List;
+import java.util.Map;
 import lombok.Builder;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
@@ -11,20 +11,14 @@ import lombok.extern.jackson.Jacksonized;
 @Builder
 @Jacksonized
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Message {
-
-  @JsonProperty("role")
-  String role;
-
-  @JsonProperty("content")
-  String content;
+public class FunctionDefinition {
 
   @JsonProperty("name")
   String name;
 
-  @JsonProperty("tool_calls")
-  List<ToolCall> toolCalls;
+  @JsonProperty("description")
+  String description;
 
-  @JsonProperty("tool_call_id")
-  String toolCallId;
+  @JsonProperty("parameters")
+  Map<String, Object> parameters;
 }

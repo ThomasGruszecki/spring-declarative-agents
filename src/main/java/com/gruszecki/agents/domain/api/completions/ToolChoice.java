@@ -1,4 +1,4 @@
-package com.gruszecki.agents.completions;
+package com.gruszecki.agents.domain.api.completions;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -10,17 +10,11 @@ import lombok.extern.jackson.Jacksonized;
 @Builder
 @Jacksonized
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Error {
-
-  @JsonProperty("message")
-  String message;
+public class ToolChoice {
 
   @JsonProperty("type")
   String type;
 
-  @JsonProperty("param")
-  String param;
-
-  @JsonProperty("code")
-  String code;
+  @JsonProperty("function")
+  FunctionChoice function;
 }

@@ -1,7 +1,8 @@
-package com.gruszecki.agents.completions;
+package com.gruszecki.agents.domain.api.completions;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.List;
 import lombok.Builder;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
@@ -10,14 +11,14 @@ import lombok.extern.jackson.Jacksonized;
 @Builder
 @Jacksonized
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ChunkChoice {
+public class Delta {
 
-  @JsonProperty("index")
-  Integer index;
+  @JsonProperty("role")
+  String role;
 
-  @JsonProperty("delta")
-  Delta delta;
+  @JsonProperty("content")
+  String content;
 
-  @JsonProperty("finish_reason")
-  String finishReason;
+  @JsonProperty("tool_calls")
+  List<ToolCall> toolCalls;
 }

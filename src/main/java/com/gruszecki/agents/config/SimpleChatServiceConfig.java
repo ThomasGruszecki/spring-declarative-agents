@@ -13,21 +13,21 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 @Slf4j
 @Getter
-public class SimpleAgentProxyConfig implements AgentProxyConfig {
+public class SimpleChatServiceConfig implements ChatServiceConfig {
 
   List<ChatService> chatServices;
 
-  public SimpleAgentProxyConfig(
+  public SimpleChatServiceConfig(
       @NonNull WebClient.Builder webClient,
       @NonNull ObjectMapper objectMapper,
-      @NonNull LlmProperties llmProperties,
+      @NonNull AgentProxyProperties agentProxyProperties,
       @NonNull PromptResolverService promptResolverService) {
-    this.chatServices = llmProperties.getProviders()
+    this.chatServices = agentProxyProperties.getProviders()
         .entrySet()
         .stream()
         .map(entry -> (ChatService) SimpleChatService.builder()
             .supportedApi(entry.getKey())
-            .llmApiClient(
+            .agentProxyApiClient(
                 CompletionsClient.builder()
                     .webClientBuilder(webClient)
                     .apiKey(entry.getValue().getApiKey())

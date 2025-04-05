@@ -1,8 +1,7 @@
-package com.gruszecki.agents.completions;
+package com.gruszecki.agents.domain.api.completions;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.List;
 import lombok.Builder;
 import lombok.Value;
 import lombok.extern.jackson.Jacksonized;
@@ -11,14 +10,9 @@ import lombok.extern.jackson.Jacksonized;
 @Builder
 @Jacksonized
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class Delta {
+public class FunctionChoice {
 
-  @JsonProperty("role")
-  String role;
-
-  @JsonProperty("content")
-  String content;
-
-  @JsonProperty("tool_calls")
-  List<ToolCall> toolCalls;
+  @JsonProperty("name")
+  String name;
 }
+

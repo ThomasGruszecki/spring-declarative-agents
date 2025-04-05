@@ -1,12 +1,12 @@
 package com.gruszecki.agents.client;
 
-import com.gruszecki.agents.completions.ChatCompletionChunk;
-import com.gruszecki.agents.completions.ChatCompletionRequest;
-import com.gruszecki.agents.completions.ChatCompletionResponse;
+import com.gruszecki.agents.domain.api.completions.ChatCompletionChunk;
+import com.gruszecki.agents.domain.api.completions.ChatCompletionRequest;
+import com.gruszecki.agents.domain.api.completions.ChatCompletionResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-public interface LlmApiClient {
+public interface AgentProxyApiClient {
 
   /**
    * Sends a chat completion request to the OpenAI API

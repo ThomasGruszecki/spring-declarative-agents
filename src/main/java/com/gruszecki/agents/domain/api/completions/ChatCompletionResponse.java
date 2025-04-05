@@ -1,4 +1,4 @@
-package com.gruszecki.agents.completions;
+package com.gruszecki.agents.domain.api.completions;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -11,7 +11,7 @@ import lombok.extern.jackson.Jacksonized;
 @Builder
 @Jacksonized
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class ChatCompletionChunk {
+public class ChatCompletionResponse {
 
   @JsonProperty("id")
   String id;
@@ -26,5 +26,8 @@ public class ChatCompletionChunk {
   String model;
 
   @JsonProperty("choices")
-  List<ChunkChoice> choices;
+  List<Choice> choices;
+
+  @JsonProperty("usage")
+  Usage usage;
 }

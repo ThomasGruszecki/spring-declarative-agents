@@ -1,20 +1,18 @@
 package com.gruszecki.agents.service;
 
 import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 import static lombok.AccessLevel.PRIVATE;
+import static org.springframework.util.StringUtils.hasText;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.gruszecki.agents.annotations.LargeLanguageModelProxy;
-import com.gruszecki.agents.annotations.Prompt;
-import com.gruszecki.agents.client.LlmApiClient;
-import com.gruszecki.agents.completions.ChatCompletionRequest;
-import com.gruszecki.agents.completions.ChatCompletionResponse;
-import com.gruszecki.agents.completions.Choice;
-import com.gruszecki.agents.completions.Message;
-import java.lang.reflect.Method;
+import com.gruszecki.agents.client.AgentProxyApiClient;
+import com.gruszecki.agents.domain.AgentProxyArguments;
+import com.gruszecki.agents.domain.api.completions.ChatCompletionRequest;
+import com.gruszecki.agents.domain.api.completions.ChatCompletionResponse;
+import com.gruszecki.agents.domain.api.completions.Choice;
+import com.gruszecki.agents.domain.api.completions.Message;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +30,7 @@ import reactor.core.publisher.Mono;
 public class SimpleChatService implements ChatService {
 
   @NonNull
-  LlmApiClient llmApiClient;
+  AgentProxyApiClient agentProxyApiClient;
 
   @NonNull
   ObjectMapper objectMapper;
@@ -44,28 +42,26 @@ public class SimpleChatService implements ChatService {
   @Getter
   String supportedApi;
 
-  public Object handlePrompt(
-      LargeLanguageModelProxy llmBeanAnnotation,
-      Prompt promptAnnotation,
-      Method method,
-      Object[] args) {
-    String resolvedPrompt = promptResolverService.resolvePrompt(promptAnnotation.value(), method.getParameters(), args);
-    log.debug("Resolved prompt for {}: {}", method.getName(), resolvedPrompt);
+  public Object handlePrompt(@NonNull final AgentProxyArguments agentProxyArguments) {
+    String resolvedPrompt = promptResolverService.resolvePrompt(agentProxyArguments);
+    log.debug("Resolved prompt for {}: {}", agentProxyArguments.getName(), resolvedPrompt);
 
-    final ChatCompletionRequest requestBody = buildSimpleLlmRequestBody(resolvedPrompt, llmBeanAnnotation);
+    final ChatCompletionRequest requestBody = buildSimpleLlmRequestBody(agentProxyArguments.getModel(),
+        agentProxyArguments.getSystemPrompt(),
+        resolvedPrompt);
     log.trace("LLM Request Body: {}", requestBody.toString());
 
     // Simplified API call
-    final Mono<ChatCompletionResponse> responseMono = llmApiClient.createChatCompletion(requestBody);
+    final Mono<ChatCompletionResponse> responseMono = agentProxyApiClient.createChatCompletion(requestBody);
     final ChatCompletionResponse rawResponse = responseMono.block();
     log.trace("LLM Raw Response: {}", rawResponse);
 
     if (isNull(rawResponse)) {
-      throw new RuntimeException("Received null response from LLM API for method " + method.getName());
+      throw new RuntimeException("Received null response from LLM API for method " + agentProxyArguments.getName());
     }
 
     try {
-      return processLlmResponse(rawResponse, method.getReturnType());
+      return processLlmResponse(rawResponse, agentProxyArguments.getReturnType());
     } catch (JsonProcessingException e) {
       throw new RuntimeException("Failed to process Llm Response", e);
     }
@@ -73,18 +69,18 @@ public class SimpleChatService implements ChatService {
 
   /**
    * Builds the request body string for the LLM API call. NOTE: Adapt based on the actual API documentation. ...
-   * (implementation from previous version) ...
    */
-  private ChatCompletionRequest buildSimpleLlmRequestBody(String userPrompt,
-      LargeLanguageModelProxy llmBeanAnnotation) {
-    final String model = llmBeanAnnotation.model();
+  private ChatCompletionRequest buildSimpleLlmRequestBody(
+      @NonNull final String model,
+      final String systemPrompt,
+      @NonNull final String userPrompt) {
     final List<Message> messages = new ArrayList<>();
 
-    if (nonNull(llmBeanAnnotation.systemPrompt())) {
+    if (hasText(systemPrompt)) {
       messages.add(
           Message.builder()
               .role("system")
-              .content(llmBeanAnnotation.systemPrompt())
+              .content(systemPrompt)
               .build()
       );
     }
