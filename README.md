@@ -8,7 +8,7 @@ It uses Spring's `WebClient` for making direct HTTP calls to configured LLM API 
 ## Features
 
 * **Declarative Clients:** Define LLM interactions using annotated Java interfaces.
-* **Annotation-Driven:** Use `@LargeLanguageModelProxy` and `@Prompt` annotations to configure clients and methods.
+* **Annotation-Driven:** Use `@AgentProxy` and `@Prompt` annotations to configure clients and methods.
 * **Custom Configuration:** Configure multiple LLM providers via `application.yml`.
 * **Argument Substitution:** Easily pass method arguments into your prompts.
 * **Structured Output:** Supports basic handling for `String` and `JsonNode` return types.
@@ -51,18 +51,18 @@ Each key under providers represents a named configuration that you can reference
 
 ## Usage
 1. Define an Interface: 
-    * Create a Java interface and annotate it with @LargeLanguageModelProxy. 
-    * Annotate methods with @Prompt. The api attribute in @LargeLanguageModelProxy must match a key under llm.providers in your configuration.
+    * Create a Java interface and annotate it with @AgentProxy. 
+    * Annotate methods with @Prompt. The api attribute in @AgentProxy must match a key under llm.providers in your configuration.
 
     ```java
     package com.myapp.llm;
     
-    import com.gruszecki.agents.annotations.LargeLanguageModelProxy; // Use your starter's package
+    import com.gruszecki.agents.annotations.AgentProxy; // Use your starter's package
     import com.gruszecki.agents.annotations.Prompt; // Use your starter's package
     import com.fasterxml.jackson.databind.JsonNode;
     import java.util.Map;
     
-    @LargeLanguageModelProxy(
+    @AgentProxy(
         // Selects the configuration block from application.yml (must match a key under llm.providers)
         api = "OpenAI",
     
@@ -150,12 +150,12 @@ Each key under providers represents a named configuration that you can reference
 
 ## How it works
 
-The starter scans for interfaces annotated with `@LargeLanguageModelProxy`. For each interface found, it registers a `FactoryBean` (`LlmFactoryBean`) that creates a dynamic proxy implementing the interface.
+The starter scans for interfaces annotated with `@AgentProxy`. For each interface found, it registers a `FactoryBean` (`LlmFactoryBean`) that creates a dynamic proxy implementing the interface.
 
 When you call a method annotated with `@Prompt` on the injected proxy:
 
 1. The InvocationHandler intercepts the call.
-2. It retrieves the LLM provider configuration (apiKey, apiUrl) from the LlmProperties bean based on the api value in the @LargeLanguageModelProxy annotation.
+2. It retrieves the LLM provider configuration (apiKey, apiUrl) from the LlmProperties bean based on the api value in the @AgentProxy annotation.
 3. It resolves the prompt template from the @Prompt annotation, substituting any {argument} placeholders with the actual method arguments.
 4. It constructs the appropriate HTTP request body for the target LLM API, including the model, system prompt, and user prompt. 
    * Note: The exact request body structure needs to be implemented correctly in LlmFactoryBean for each supported API type.
