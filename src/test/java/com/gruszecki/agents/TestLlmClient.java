@@ -1,16 +1,16 @@
 package com.gruszecki.agents;
 
-import com.gruszecki.agents.annotations.LargeLanguageModelProxy;
+import com.gruszecki.agents.annotations.AgentProxy;
 import com.gruszecki.agents.annotations.Prompt;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.Map;
 
 /**
- * A test interface annotated with @LargeLanguageModelProxy to be implemented
+ * A test interface annotated with @AgentProxy to be implemented
  * dynamically by the starter's proxy mechanism during integration tests.
  */
-@LargeLanguageModelProxy(
+@AgentProxy(
         api = "TestLM", // Must match a provider key in application-test.yml
         model = "test-model-v1",
         systemPrompt = "You are a helpful test assistant."
