@@ -4,11 +4,11 @@ package com.gruszecki.agents.autoconfig;
 import static java.util.Objects.isNull;
 import static java.util.Objects.requireNonNull;
 
-import com.gruszecki.agents.annotations.LargeLanguageModelProxy;
+import com.gruszecki.agents.annotations.AgentProxy;
 import com.gruszecki.agents.annotations.Prompt;
-import com.gruszecki.agents.config.DefaultConfig;
-import com.gruszecki.agents.config.LlmProperties;
-import com.gruszecki.agents.proxy.LlmFactoryBean;
+import com.gruszecki.agents.config.AgentProxyBeansConfig;
+import com.gruszecki.agents.config.AgentProxyProperties;
+import com.gruszecki.agents.proxy.AgentProxyFactoryBean;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -34,12 +34,11 @@ import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
 /**
- * Auto-configuration class for the Spring LLM Starter. Scans for @LargeLanguageModelProxy interfaces and registers
- * FactoryBeans.
+ * Auto-configuration class for the Spring LLM Starter. Scans for @AgentProxy interfaces and registers FactoryBeans.
  */
 @AutoConfiguration
-@ConditionalOnClass({LlmProperties.class, LlmFactoryBean.class})
-@Import(DefaultConfig.class)
+@ConditionalOnClass({AgentProxyProperties.class, AgentProxyFactoryBean.class})
+@Import(AgentProxyBeansConfig.class)
 @Slf4j
 public class SpringDeclarativeAgentsAutoConfig implements BeanDefinitionRegistryPostProcessor, ApplicationContextAware {
 
@@ -52,7 +51,7 @@ public class SpringDeclarativeAgentsAutoConfig implements BeanDefinitionRegistry
 
   @Override
   public void postProcessBeanDefinitionRegistry(BeanDefinitionRegistry registry) throws BeansException {
-    log.info("Scanning for @LargeLanguageModelProxy interfaces...");
+    log.info("Scanning for @AgentProxy interfaces...");
     final ClassPathScanningCandidateComponentProvider scanner =
         new ClassPathScanningCandidateComponentProvider(false) {
           @Override
@@ -60,7 +59,7 @@ public class SpringDeclarativeAgentsAutoConfig implements BeanDefinitionRegistry
             return super.isCandidateComponent(beanDefinition) || beanDefinition.getMetadata().isAbstract();
           }
         };
-    scanner.addIncludeFilter(new AnnotationTypeFilter(LargeLanguageModelProxy.class));
+    scanner.addIncludeFilter(new AnnotationTypeFilter(AgentProxy.class));
     final Integer count = Stream.of(determineBasePackages())
         .map(basePackage -> Objects.equals(basePackage, "*") ? "" : basePackage)
         .flatMap(basePackage -> scanner.findCandidateComponents(basePackage).stream())
@@ -84,11 +83,11 @@ public class SpringDeclarativeAgentsAutoConfig implements BeanDefinitionRegistry
       );
 
       if (!interfaceClass.isInterface()) {
-        log.warn("Skipping non-interface class annotated with @LargeLanguageModelProxy: {}", interfaceClass.getName());
+        log.warn("Skipping non-interface class annotated with @AgentProxy: {}", interfaceClass.getName());
         return 0;
       }
 
-      LargeLanguageModelProxy annotation = interfaceClass.getAnnotation(LargeLanguageModelProxy.class);
+      AgentProxy annotation = interfaceClass.getAnnotation(AgentProxy.class);
       if (isNull(annotation)) {
         return 0;
       }
@@ -106,9 +105,8 @@ public class SpringDeclarativeAgentsAutoConfig implements BeanDefinitionRegistry
           .filter(StringUtils::hasText)
           .orElseGet(() -> StringUtils.uncapitalize(interfaceClass.getSimpleName()) + "LlmProxyBean");
 
-      factoryBeanDefinition.setBeanClass(LlmFactoryBean.class);
+      factoryBeanDefinition.setBeanClass(AgentProxyFactoryBean.class);
       factoryBeanDefinition.getConstructorArgumentValues().addIndexedArgumentValue(0, interfaceClass);
-      factoryBeanDefinition.getConstructorArgumentValues().addIndexedArgumentValue(1, applicationContext);
       factoryBeanDefinition.setAttribute("factoryBeanObjectType", interfaceClass);
 
       log.info("Registering LLM FactoryBean definition '{}' for interface {}", beanName, interfaceClass.getName());
@@ -127,8 +125,8 @@ public class SpringDeclarativeAgentsAutoConfig implements BeanDefinitionRegistry
   }
 
   /**
-   * Determines the base packages to scan for @LargeLanguageModelProxy interfaces. Uses 'spring.llm.scan-packages'
-   * property, falls back to the main application package, or scans all packages as a last resort.
+   * Determines the base packages to scan for @AgentProxy interfaces. Uses 'spring.llm.scan-packages' property, falls
+   * back to the main application package, or scans all packages as a last resort.
    *
    * @return Array of base packages to scan.
    */
