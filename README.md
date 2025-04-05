@@ -15,7 +15,7 @@ It uses Spring's `WebClient` for making direct HTTP calls to configured LLM API 
 
 ## Prerequisites
 
-* Java 17+
+* Java 24
 * Spring Boot 3.x+
 * Maven or Gradle
 
